@@ -2,6 +2,7 @@
 const express = require('express');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+const sequelize = require('./config/connection');
 
 // Declare port and app variable
 const PORT = process.env.PORT || 3001;
@@ -10,6 +11,10 @@ const app = express();
 // Declare middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+function viewEmployees(){
+
+}
 
 function addEmployee(){
 
@@ -36,7 +41,7 @@ function addDepartment(){
 }
 
 function restartAction() {
-
+    requestAction();
 }
 
 function requestAction() {
@@ -46,13 +51,16 @@ function requestAction() {
                 type: "list",
                 message: "What would you like to do?",
                 name: "requestAction",
-                choices: ["Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"],
+                choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"],
                 default: "Quit"
             }
         ])
         .then((response) => {
             const userAction = response.requestAction;
             switch(userAction){
+                case "View All Employees":
+                    viewEmployees();
+                    break;
                 case "Add Employee":
                     addEmployee();
                     break;
@@ -79,3 +87,7 @@ function requestAction() {
 }
 
 requestAction();
+
+sequelize.sync().then(() => {
+    app.listen(PORT, () => console.log('Now Listening'));
+});
