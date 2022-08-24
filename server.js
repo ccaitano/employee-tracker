@@ -71,8 +71,17 @@ function viewDepartments() {
     });
 }
 
-function addDepartment(){
-
+function addDepartment(newDepartmentName){
+    console.log(newDepartmentName);
+    db.query(`INSERT INTO department (department_name) VALUES(?)`, newDepartmentName, function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        
+        console.log("New Department Added");
+        viewDepartments();
+    });
 }
 
 function restartAction() {
@@ -127,7 +136,18 @@ function requestAction() {
                     viewDepartments();
                     break;
                 case "Add Department":
-                    addDepartment();
+                    inquirer
+                        .prompt([
+                            {
+                                type: "input",
+                                message: "Please Enter a New Department Name:",
+                                name: "newDepartment"
+                            }
+                        ])
+                        .then((response) => {
+                            const newDepartmentName = response.newDepartment;
+                            addDepartment(newDepartmentName);
+                        });
                     break;
                 case "Quit":
                     restartAction();
