@@ -22,6 +22,19 @@ const db = mysql.createConnection(
     },
     console.log('Connected to the company_db database.')
 );
+// Declare global variables
+db.query(`SELECT * FROM department`, function (err, results) {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    var departments = results.map(({ id, department_name }) => ({
+        value: id, name: `${department_name}`
+    }));
+    console.log(departments);
+    requestAction(departments);
+});
+
 
 function viewEmployees(){
     db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id`, function (err, results) {
@@ -44,7 +57,7 @@ function updateEmployee(){
 }
 
 function viewRoles(){
-    db.query(`SELECT * FROM emp_role`, function (err, results) {
+    db.query(`SELECT id, title, salary FROM emp_role`, function (err, results) {
         if (err) {
             console.log(err);
             return;
@@ -55,8 +68,17 @@ function viewRoles(){
     });
 }
 
-function addRole() {
-
+function addRole(newRole, newSalary, newRoleDep) {
+    
+    db.query(`INSERT INTO emp_role (title, salary, department_id) VALUES(?, ?, ?)`, [newRole, newSalary, newRoleDep], function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        
+        console.log("New Role Added");
+        viewRoles();
+    });
 }
 
 function viewDepartments() {
@@ -72,7 +94,6 @@ function viewDepartments() {
 }
 
 function addDepartment(newDepartmentName){
-    console.log(newDepartmentName);
     db.query(`INSERT INTO department (department_name) VALUES(?)`, newDepartmentName, function (err, results) {
         if (err) {
             console.log(err);
@@ -103,7 +124,7 @@ function restartAction() {
         })
 }
 
-function requestAction() {
+function requestAction(departments) {
     inquirer
         .prompt([
             {
@@ -130,7 +151,32 @@ function requestAction() {
                     viewRoles();
                     break;
                 case "Add Role":
-                    addRole();
+                    inquirer
+                        .prompt([
+                            {
+                                type: "input",
+                                message: "Please Enter a New Role:",
+                                name: "newRole"
+                            },
+                            {
+                                type: "input",
+                                message: "Please Enter a Salary:",
+                                name: "newSalary"
+                            },
+                            {
+                                type: "list",
+                                message: "Please Enter the Applicable Department",
+                                name: "newRoleDep",
+                                choices: departments
+                            },
+                        ])
+                        .then((response) => {
+                            const newRole = response.newRole;
+                            const newSalary = response.newSalary;
+                            const newRoleDep = response.newRoleDep;
+                            addRole(newRole, newSalary, newRoleDep);
+                            
+                        });
                     break;
                 case "View All Departments":
                     viewDepartments();
@@ -156,4 +202,3 @@ function requestAction() {
         })
 }
 
-requestAction();
