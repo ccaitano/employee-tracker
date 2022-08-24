@@ -23,17 +23,14 @@ const db = mysql.createConnection(
     console.log('Connected to the company_db database.')
 );
 // Declare global variables
-db.query(`SELECT * FROM department`, function (err, results) {
-    if (err) {
-        console.log(err);
-        return;
-    }
-    var departments = results.map(({ id, department_name }) => ({
-        value: id, name: `${department_name}`
-    }));
-    console.log(departments);
-    requestAction(departments);
-});
+
+function getDepartments(){
+    
+}
+
+function getRoles() {
+    
+};
 
 
 function viewEmployees(){
@@ -42,14 +39,20 @@ function viewEmployees(){
             console.log(err);
             return;
         }
-
         console.table(results);
         restartAction();
     });
 }
 
-function addEmployee(){
-
+function addEmployee(firstName, lastName, newEmpRole){
+    db.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES(?, ?, ?)`, [firstName, lastName, newEmpRole], function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log("New Employee Added");
+        viewEmployees();
+    });
 }
 
 function updateEmployee(){
@@ -62,20 +65,17 @@ function viewRoles(){
             console.log(err);
             return;
         }
-
         console.table(results);
         restartAction();
     });
 }
 
 function addRole(newRole, newSalary, newRoleDep) {
-    
     db.query(`INSERT INTO emp_role (title, salary, department_id) VALUES(?, ?, ?)`, [newRole, newSalary, newRoleDep], function (err, results) {
         if (err) {
             console.log(err);
             return;
         }
-        
         console.log("New Role Added");
         viewRoles();
     });
@@ -87,7 +87,6 @@ function viewDepartments() {
             console.log(err);
             return;
         }
-
         console.table(results);
         restartAction();
     });
@@ -99,7 +98,6 @@ function addDepartment(newDepartmentName){
             console.log(err);
             return;
         }
-        
         console.log("New Department Added");
         viewDepartments();
     });
@@ -124,7 +122,7 @@ function restartAction() {
         })
 }
 
-function requestAction(departments) {
+function requestAction() {
     inquirer
         .prompt([
             {
@@ -142,7 +140,40 @@ function requestAction(departments) {
                     viewEmployees();
                     break;
                 case "Add Employee":
-                    addEmployee();
+                    db.query(`SELECT * FROM emp_role`, function (err, results) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        var roles = results.map(({ id, title, salary, department_id }) => ({
+                            value: id, name: `${title}`
+                        }));
+                        inquirer
+                        .prompt([
+                            {
+                                type: "input",
+                                message: "Please Enter the New Employee's First Name:",
+                                name: "firstName"
+                            },
+                            {
+                                type: "input",
+                                message: "Please Enter the New Employee's Last Name:",
+                                name: "lastName"
+                            },
+                            {
+                                type: "list",
+                                message: "Please Enter the New Employee's Role: ",
+                                name: "newEmpRole",
+                                choices: roles
+                            },
+                        ])
+                        .then((response) => {
+                            const firstName = response.firstName;
+                            const lastName = response.lastName;
+                            const newEmpRole = response.newEmpRole;
+                            addEmployee(firstName, lastName, newEmpRole);
+                        });
+                    });
                     break;
                 case "Update Employee Role":
                     updateEmployee();
@@ -151,7 +182,15 @@ function requestAction(departments) {
                     viewRoles();
                     break;
                 case "Add Role":
-                    inquirer
+                    db.query(`SELECT * FROM department`, function (err, results) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        var departments = results.map(({ id, department_name }) => ({
+                            value: id, name: `${department_name}`
+                        }));
+                        inquirer
                         .prompt([
                             {
                                 type: "input",
@@ -174,9 +213,10 @@ function requestAction(departments) {
                             const newRole = response.newRole;
                             const newSalary = response.newSalary;
                             const newRoleDep = response.newRoleDep;
-                            addRole(newRole, newSalary, newRoleDep);
+                              addRole(newRole, newSalary, newRoleDep);
                             
                         });
+                    });
                     break;
                 case "View All Departments":
                     viewDepartments();
@@ -202,3 +242,10 @@ function requestAction(departments) {
         })
 }
 
+// function companyInit(){
+
+//     requestAction(departments, roles);
+// }
+
+// companyInit();
+requestAction();
