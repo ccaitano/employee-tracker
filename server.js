@@ -2,7 +2,7 @@
 const express = require('express');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-const sequelize = require('./config/connection');
+const cTable = require('console.table');
 
 // Declare port and app variable
 const PORT = process.env.PORT || 3001;
@@ -12,8 +12,27 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-function viewEmployees(){
+// Connect to database
+const db = mysql.createConnection(
+    {
+        host:'localhost',
+        user:'root',
+        password:'Toshio_10',
+        database: 'company_db'
+    },
+    console.log('Connected to the company_db database.')
+);
 
+function viewEmployees(){
+    db.query(`SELECT * FROM employee`, function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+
+        console.table(results);
+        restartAction();
+    });
 }
 
 function addEmployee(){
@@ -41,7 +60,22 @@ function addDepartment(){
 }
 
 function restartAction() {
-    requestAction();
+    inquirer
+        .prompt([
+            {
+                type: "confirm",
+                message: "Enter 'Y' to return to the Main Menu",
+                name: "mainMenu",
+                default: true
+            }
+        ])
+        .then((response) => {
+            const mainMenu = response.mainMenu;
+            if (mainMenu) {
+                requestAction();
+                return;
+            }
+        })
 }
 
 function requestAction() {
@@ -87,7 +121,3 @@ function requestAction() {
 }
 
 requestAction();
-
-sequelize.sync().then(() => {
-    app.listen(PORT, () => console.log('Now Listening'));
-});
