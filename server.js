@@ -22,16 +22,6 @@ const db = mysql.createConnection(
     },
     console.log('Connected to the company_db database.')
 );
-// Declare global variables
-
-function getDepartments(){
-    
-}
-
-function getRoles() {
-    
-};
-
 
 function viewEmployees(){
     db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id`, function (err, results) {
@@ -55,8 +45,15 @@ function addEmployee(firstName, lastName, newEmpRole){
     });
 }
 
-function updateEmployee(){
-
+function updateEmployee(empFirstName, updatedRole){
+    db.query(`UPDATE employee SET role_id = ? WHERE first_name = ? `, [updatedRole, empFirstName], function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log("Employee Successfully Updated!");
+        viewEmployees();
+    });
 }
 
 function viewRoles(){
@@ -176,7 +173,46 @@ function requestAction() {
                     });
                     break;
                 case "Update Employee Role":
-                    updateEmployee();
+                    db.query(`SELECT * FROM employee`, function (err, results) {
+                        if (err) {
+                            console.log(err);
+                            return;
+                        }
+                        var employees = results.map(({ id, first_name, last_name, role_id }) => ({
+                            value: first_name, name: `${first_name} ${last_name}`
+                        }));
+                        db.query(`SELECT * FROM emp_role`, function (err, results) {
+                            if (err) {
+                                console.log(err);
+                                return;
+                            }
+                            var roles = results.map(({ id, title, salary, department_id }) => ({
+                                value: id, name: `${title}`
+                            }));
+                            inquirer
+                            .prompt([
+                                {
+                                    type: "list",
+                                    message: "Please Select the Employee Record to Update: ",
+                                    name: "empFirstName",
+                                    choices: employees
+                                },
+                                {
+                                    type: "list",
+                                    message: "Please Select a New Role for the Selected Employee: ",
+                                    name: "updatedRole",
+                                    choices: roles
+                                }
+                            ])
+                            .then((response) => {
+                                const empFirstName = response.empFirstName;
+                                const updatedRole = response.updatedRole;
+                                console.log(empFirstName);
+                                console.log(updatedRole);
+                                updateEmployee(empFirstName, updatedRole);
+                            });
+                        });
+                    });
                     break;
                 case "View All Roles":
                     viewRoles();
@@ -242,10 +278,4 @@ function requestAction() {
         })
 }
 
-// function companyInit(){
-
-//     requestAction(departments, roles);
-// }
-
-// companyInit();
 requestAction();
