@@ -24,7 +24,7 @@ const db = mysql.createConnection(
 );
 
 function viewEmployees(){
-    db.query(`SELECT * FROM employee`, function (err, results) {
+    db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id`, function (err, results) {
         if (err) {
             console.log(err);
             return;
@@ -44,7 +44,15 @@ function updateEmployee(){
 }
 
 function viewRoles(){
+    db.query(`SELECT * FROM emp_role`, function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
 
+        console.table(results);
+        restartAction();
+    });
 }
 
 function addRole() {
@@ -52,7 +60,15 @@ function addRole() {
 }
 
 function viewDepartments() {
+    db.query(`SELECT * FROM department`, function (err, results) {
+        if (err) {
+            console.log(err);
+            return;
+        }
 
+        console.table(results);
+        restartAction();
+    });
 }
 
 function addDepartment(){
