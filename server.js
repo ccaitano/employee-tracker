@@ -17,7 +17,7 @@ const db = mysql.createConnection(
     {
         host:'localhost',
         user:'root',
-        password:'Toshio_10',
+        password:'password',
         database: 'company_db'
     },
     console.log('Connected to the company_db database.')
@@ -127,7 +127,6 @@ function requestAction() {
                 message: "What would you like to do?",
                 name: "requestAction",
                 choices: ["View All Employees", "Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"],
-                default: "Quit"
             }
         ])
         .then((response) => {
@@ -275,7 +274,11 @@ function requestAction() {
                     restartAction();
                     break;
             }
-        })
+        });
 }
 
 requestAction();
+
+// app.listen(PORT, () => {
+//     console.log(`\nServer running on port ${PORT}`);
+//   });
