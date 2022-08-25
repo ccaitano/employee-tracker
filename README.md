@@ -58,7 +58,8 @@ Employee Tracker Update Existing Employee:
 ![Screenshot of Update Existing Employee](./assets/images/update-employee.JPG)
 
 Employee Tracker Walkthrough:
-![Walkthrough of Employee Tracker]()
+
+![Walkthrough of Employee Tracker](./assets/images/Walkthrough-GIF.gif)
 
 ## **License**
 
