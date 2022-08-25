@@ -57,6 +57,8 @@ Employee Tracker Update Existing Employee:
 
 ![Screenshot of Update Existing Employee](./assets/images/update-employee.JPG)
 
+Employee Tracker Walkthrough:
+![Walkthrough of Employee Tracker]()
 
 ## **License**
 
@@ -89,8 +91,8 @@ SOFTWARE.
 
 - [JavaScript](https://www.javascript.com/) Scripting Language
 - [Node](https://nodejs.org/en/) JavaScript runtime
-- [npm](https://www.npmjs.com/) Inquirer, Express, UUID, etc.
-- [Heroku](https://devcenter.heroku.com/) Cloud Application Platform
+- [npm](https://www.npmjs.com/) Inquirer, msql2, sequelize, console.table
+- [MySQL](https://dev.mysql.com/doc/) MySQL Database
 
 ## **Questions**
 
@@ -98,3 +100,5 @@ For any questions or contributions please contact me on Github or by e-mail:
 
 [Github Profile](https://www.github.com/ccaitano)  
 [Email Me](mailto:cheryl.caitano@gmail.com)
+
+Will update in the future to add delete functionality and the ability to view employees by department and by manager.
