@@ -235,8 +235,6 @@ function requestAction() {
                             .then((response) => {
                                 const empFirstName = response.empFirstName;
                                 const updatedRole = response.updatedRole;
-                                console.log(empFirstName);
-                                console.log(updatedRole);
                                 updateEmployee(empFirstName, updatedRole);
                             });
                         });
