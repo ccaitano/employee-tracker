@@ -24,7 +24,7 @@ const db = mysql.createConnection(
 );
 
 function viewEmployees(){
-    db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id`, function (err, results) {
+    db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager_name FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id JOIN employee manager ON manager.id = employee.manager_id`, function (err, results) {
         if (err) {
             console.log(err);
             return;
@@ -271,7 +271,7 @@ function requestAction() {
                         });
                     break;
                 case "Quit":
-                    restartAction();
+                    db.end();
                     break;
             }
         });

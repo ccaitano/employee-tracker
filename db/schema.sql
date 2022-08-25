@@ -21,8 +21,11 @@ CREATE TABLE employee (
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     role_id INT NOT NULL,
+    manager_id INT,
     FOREIGN KEY (role_id)
     REFERENCES emp_role(id)
-    ON DELETE CASCADE
-    -- NEED TO ADD IN MANAGER CAPABILITY
+    ON DELETE CASCADE,
+    FOREIGN KEY (manager_id)
+    REFERENCES employee(id)
+    ON DELETE SET NULL
 );
