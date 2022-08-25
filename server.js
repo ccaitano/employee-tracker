@@ -23,6 +23,7 @@ const db = mysql.createConnection(
     console.log('Connected to the company_db database.')
 );
 
+// Function to view all employees
 function viewEmployees(){
     db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager_name FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id LEFT JOIN employee manager ON manager.id = employee.manager_id`, function (err, results) {
         if (err) {
@@ -34,6 +35,7 @@ function viewEmployees(){
     });
 }
 
+// Function to add new employees
 function addEmployee(firstName, lastName, newEmpRole, newEmpManager){
     db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?, ?, ?, ?)`, [firstName, lastName, newEmpRole, newEmpManager], function (err, results) {
         if (err) {
@@ -46,6 +48,7 @@ function addEmployee(firstName, lastName, newEmpRole, newEmpManager){
     });
 }
 
+// Function to update existing employees
 function updateEmployee(empFirstName, updatedRole){
     db.query(`UPDATE employee SET role_id = ? WHERE first_name = ? `, [updatedRole, empFirstName], function (err, results) {
         if (err) {
@@ -57,6 +60,7 @@ function updateEmployee(empFirstName, updatedRole){
     });
 }
 
+// Function to view all roles
 function viewRoles(){
     db.query(`SELECT emp_role.id, emp_role.title, department.department_name AS department, emp_role.salary FROM emp_role JOIN department ON department.id = emp_role.department_id`, function (err, results) {
         if (err) {
@@ -68,6 +72,7 @@ function viewRoles(){
     });
 }
 
+// Function to add new roles
 function addRole(newRole, newSalary, newRoleDep) {
     db.query(`INSERT INTO emp_role (title, salary, department_id) VALUES(?, ?, ?)`, [newRole, newSalary, newRoleDep], function (err, results) {
         if (err) {
@@ -79,6 +84,7 @@ function addRole(newRole, newSalary, newRoleDep) {
     });
 }
 
+// Function to view all departments
 function viewDepartments() {
     db.query(`SELECT * FROM department`, function (err, results) {
         if (err) {
@@ -90,6 +96,7 @@ function viewDepartments() {
     });
 }
 
+// Function to add new departments
 function addDepartment(newDepartmentName){
     db.query(`INSERT INTO department (department_name) VALUES(?)`, newDepartmentName, function (err, results) {
         if (err) {
@@ -101,6 +108,7 @@ function addDepartment(newDepartmentName){
     });
 }
 
+// Function to restart main menu
 function restartAction() {
     inquirer
         .prompt([
@@ -120,6 +128,7 @@ function restartAction() {
         })
 }
 
+// Funtion to initiate main menu
 function requestAction() {
     inquirer
         .prompt([
@@ -297,4 +306,5 @@ function requestAction() {
         });
 }
 
+// Initiante main menu
 requestAction();
