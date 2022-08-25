@@ -58,7 +58,7 @@ function updateEmployee(empFirstName, updatedRole){
 }
 
 function viewRoles(){
-    db.query(`SELECT id, title, salary FROM emp_role`, function (err, results) {
+    db.query(`SELECT emp_role.id, emp_role.title, department.department_name AS department, emp_role.salary FROM emp_role JOIN department ON department.id = emp_role.department_id`, function (err, results) {
         if (err) {
             console.log(err);
             return;
