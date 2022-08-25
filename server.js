@@ -24,7 +24,7 @@ const db = mysql.createConnection(
 );
 
 function viewEmployees(){
-    db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager_name FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id JOIN employee manager ON manager.id = employee.manager_id`, function (err, results) {
+    db.query(`SELECT employee.id, employee.first_name, employee.last_name, emp_role.title, department.department_name, emp_role.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager_name FROM employee JOIN emp_role ON employee.role_id = emp_role.id JOIN department ON department.id = emp_role.department_id LEFT JOIN employee manager ON manager.id = employee.manager_id`, function (err, results) {
         if (err) {
             console.log(err);
             return;
@@ -34,12 +34,13 @@ function viewEmployees(){
     });
 }
 
-function addEmployee(firstName, lastName, newEmpRole){
-    db.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES(?, ?, ?)`, [firstName, lastName, newEmpRole], function (err, results) {
+function addEmployee(firstName, lastName, newEmpRole, newEmpManager){
+    db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES(?, ?, ?, ?)`, [firstName, lastName, newEmpRole, newEmpManager], function (err, results) {
         if (err) {
             console.log(err);
             return;
         }
+        console.log(newEmpManager);
         console.log("New Employee Added");
         viewEmployees();
     });
@@ -144,6 +145,17 @@ function requestAction() {
                         var roles = results.map(({ id, title, salary, department_id }) => ({
                             value: id, name: `${title}`
                         }));
+                        db.query(`SELECT id, CONCAT(first_name, ' ', last_name) AS manager_name FROM employee`, function (err, results) {
+                            if (err) {
+                                console.log(err);
+                                return;
+                            }
+                            var noManager = {id: 0, manager_name: "None"};
+                            results.push(noManager);
+                            var managers = results.map(({ id, manager_name}) => ({
+                                value: id, name: `${manager_name}`
+                            }));
+                            
                         inquirer
                         .prompt([
                             {
@@ -162,14 +174,22 @@ function requestAction() {
                                 name: "newEmpRole",
                                 choices: roles
                             },
+                            {
+                                type: "list",
+                                message: "Please Enter the New Employee's Manager: ",
+                                name: "newEmpManager",
+                                choices: managers
+                            },
                         ])
                         .then((response) => {
                             const firstName = response.firstName;
                             const lastName = response.lastName;
                             const newEmpRole = response.newEmpRole;
-                            addEmployee(firstName, lastName, newEmpRole);
+                            const newEmpManager = response.newEmpManager;
+                            addEmployee(firstName, lastName, newEmpRole, newEmpManager);
                         });
                     });
+                });
                     break;
                 case "Update Employee Role":
                     db.query(`SELECT * FROM employee`, function (err, results) {
@@ -278,7 +298,3 @@ function requestAction() {
 }
 
 requestAction();
-
-// app.listen(PORT, () => {
-//     console.log(`\nServer running on port ${PORT}`);
-//   });
